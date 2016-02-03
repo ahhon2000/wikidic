@@ -9,7 +9,22 @@ if [ $# -lt 1 ]; then
 	exit 1
 fi
 
-phrase="`echo $@`"
+flgNoLess=0
+
+arr=()
+for a; do
+	if [ $a = '-n' ]; then
+		flgNoLess=1
+		continue
+	fi
+	arr+=("$a")
+done
+
+phrase="`echo ${arr[@]}`"
 url="$urlBase/$phrase"
 
-lynx -dump "$url" | less
+if [ $flgNoLess -ne 0 ]; then
+	lynx -dump "$url"
+else
+	lynx -dump "$url" | less
+fi
