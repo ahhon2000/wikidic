@@ -29,7 +29,8 @@ trap cleanup SIGINT
 
 dict "$w" > "$tmp"
 if [ $? -ne 0 ]; then
-	wikidic -n "$w" > "$tmp"
+	#wikidic -n "$w" > "$tmp"
+	oxdic -n "$w" > "$tmp"
 fi
 
 if [ $flgLess -ne 0 ]; then

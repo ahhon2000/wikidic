@@ -6,13 +6,12 @@
 
 set -u
 
-urlBase="http://en.wiktionary.org/wiki"
+urlBase="http://en.oxforddictionaries.com/definition"
 pager="cat"
-dirCache="/tmp/.wikidic_cache"
+dirCache="/tmp/.oxdic_cache"
 
 rmScum() {
-	sed '/^Contents\>/,/^[^[:space:]]/d; /^Translation/,/^[^[:space:]]/d; /^Navigation menu/,$d; /^Anagrams/,/^[^[:space:]]/d; /^Statistics/,/^[^[:space:]]/d; /^Related terms/,/^[^[:space:]]/d; /^Derived terms/,/^[^[:space:]]/d;'
-	
+	sed -n '/definition.*\s\+of.*in/I,/^\s\+Word of the Day/p;'
 }
 
 if [ $# -eq 1 ] && [ "$1" = '-c' ]; then
