@@ -9,6 +9,7 @@ set -u
 urlBase="http://en.oxforddictionaries.com/definition"
 pager="cat"
 dirCache="/tmp/.oxdic_cache"
+TIMEOUT_SECONDS=15
 
 rmScum() {
 	sed -n '/definition.*\s\+of.*in/I,/^\s\+Word of the Day/p;'
@@ -47,7 +48,7 @@ fi
 
 fileCache="$dirCache/$phrase"
 if [ '!' -e "$fileCache" ]; then
-	lynx -dump "$url" > "$fileCache"
+	timeout "$TIMEOUT_SECONDS" lynx -dump "$url" > "$fileCache"
 fi
 
 cat "$fileCache" | rmScum | "$pager"
