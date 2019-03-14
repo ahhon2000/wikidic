@@ -8,7 +8,7 @@ set -u
 
 urlBase="http://en.wiktionary.org/wiki"
 pager="cat"
-dirCache="/tmp/.wikidic_cache"
+dirCache="$HOME/.wikidic_cache"
 
 rmScum() {
 	sed '/^Contents\>/,/^[^[:space:]]/d; /^Translation/,/^[^[:space:]]/d; /^Navigation menu/,$d; /^Anagrams/,/^[^[:space:]]/d; /^Statistics/,/^[^[:space:]]/d; /^Related terms/,/^[^[:space:]]/d; /^Derived terms/,/^[^[:space:]]/d;'

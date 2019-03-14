@@ -8,7 +8,7 @@ set -u
 
 urlBase="http://en.oxforddictionaries.com/definition"
 pager="cat"
-dirCache="/tmp/.oxdic_cache"
+dirCache="$HOME/.oxdic_cache"
 TIMEOUT_SECONDS=15
 
 rmScum() {
