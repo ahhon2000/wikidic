@@ -14,7 +14,7 @@ for l in sys.stdin:
 
 for t in ts:
 	print(t)
-if ts: print("")
+if ts: print("     *")
 
 for l in ls:
 	print(l)
