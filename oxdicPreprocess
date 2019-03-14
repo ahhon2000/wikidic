@@ -1,0 +1,20 @@
+#!/usr/bin/python3
+
+import sys
+import re
+
+ls = []
+ts = []  # transcriptions
+for l in sys.stdin:
+	l = re.sub(r'\n', '', l)
+	ls += [l]
+
+	if re.search(r'[/][^/]+[/]', l):
+		ts += [l]
+
+for t in ts:
+	print(t)
+if ts: print("")
+
+for l in ls:
+	print(l)
