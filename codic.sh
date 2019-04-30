@@ -19,7 +19,8 @@ rmScum() {
 	sed "1,/^Definition of '/d" | \
 		sed '/^[()*[:space:]]\+$/d' | \
 		sed '/^[[:space:]]*Word Frequency[[:space:]]*$/d' | \
-		sed '/^Translations for\>/,$d' | sed '/^Trends of\>/,$d'
+		sed '/^Translations for\>/,$d' | sed '/^Trends of\>/,$d' | \
+		sed '/^[[:space:]]*References[[:space:]]*$/,$d'
 }
 
 if [ $# -eq 1 ] && [ "$1" = '-c' ]; then
