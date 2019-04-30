@@ -6,10 +6,10 @@
 
 set -u
 
-urlBase="http://en.oxforddictionaries.com/definition"
+urlBase="https://en.oxforddictionaries.com/definition"
 pager="cat"
 dirCache="$HOME/.oxdic_cache"
-TIMEOUT_SECONDS=15
+TIMEOUT_SECONDS=25
 pathScript="`readlink -f "$0"`"
 dirScript="`dirname "$pathScript"`"
 preprocess="$dirScript/oxdicPreprocess"
