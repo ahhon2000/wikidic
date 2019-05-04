@@ -1,8 +1,6 @@
 #!/bin/bash
 #
 # USAGE: wikidic WORD
-#	 or:
-#	 wikidic -c   # clear cache
 
 set -u
 
@@ -15,11 +13,50 @@ rmScum() {
 	
 }
 
-if [ $# -eq 1 ] && [ "$1" = '-c' ]; then
-	# clear cache
-	find "$dirCache" -mindepth 1 -maxdepth 1 -delete
-	exit 0
-fi
+outputter() {
+	cat "$fileCache" | rmScum | "$pager"
+}
+
+
+print_usage(){
+	fd=1
+	[ "$1" -ne 0 ] && fd=2
+	cat >&$fd << EOF
+Usage: $0 [options]...
+    -h, --help               Print help
+    -r, --redownload         Redownload article if empty
+EOF
+	exit "$1"
+}
+
+SHORTOPTS='hnr'
+LONGOPTS='help,no-less,redownload'
+args=`getopt -l $LONGOPTS $SHORTOPTS "$@"` || print_usage 1 >&2
+
+eval set -- $args
+
+flgNoLess=0
+flgRedownload=0
+
+while [ "$1" '!=' -- ]; do
+	case "$1" in
+		--help | -h)
+			print_usage 0 >&1
+		;;
+		--no-less | -n)
+			flgNoLess=1
+		;;
+		--redownload | -r)
+			flgRedownload=1
+		;;
+		?)
+			print_usage 1
+		;;
+	esac
+	shift
+done
+shift
+
 
 if [ $# -lt 1 ]; then
 	echo give a word >&2
@@ -28,14 +65,8 @@ fi
 
 mkdir -p "$dirCache"
 
-flgNoLess=0
-
 arr=()
 for a; do
-	if [ "$a" = '-n' ]; then
-		flgNoLess=1
-		continue
-	fi
 	arr+=("$a")
 done
 
@@ -47,8 +78,8 @@ if [ $flgNoLess -eq 0 ]; then
 fi
 
 fileCache="$dirCache/$phrase"
-if [ '!' -e "$fileCache" ]; then
+if [ '!' -e "$fileCache" ] || ( [ $flgRedownload -ne 0 ] && ! outputter | grep '[^[:space:]]'  > /dev/null ); then
 	lynx -dump "$url" > "$fileCache"
 fi
 
-cat "$fileCache" | rmScum | "$pager"
+outputter
