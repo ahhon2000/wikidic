@@ -17,11 +17,12 @@ preprocess="cat"
 fileTmp="/tmp/.codicCache.$$.$RANDOM"
 
 rmScum() {
-	sed "1,/^Definition of '/d" | \
+	sed "1,/^Definition\s\+of\s\+'/d" | \
 		sed '/^[()*[:space:]]\+$/d' | \
 		sed '/^[[:space:]]*Word Frequency[[:space:]]*$/d' | \
 		sed '/^Translations for\>/,$d' | sed '/^Trends of\>/,$d' | \
-		sed '/^[[:space:]]*References[[:space:]]*$/,$d'
+		sed '/^[[:space:]]*References[[:space:]]*$/,$d' | \
+		sed '/^\s*Share\s*$/d'
 }
 
 print_usage(){
