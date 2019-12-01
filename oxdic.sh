@@ -6,7 +6,8 @@
 
 set -u
 
-urlBase="http://en.oxforddictionaries.com/definition"
+#urlBase="http://en.oxforddictionaries.com/definition"
+urlBase="http://www.lexico.com/en/definition"
 pager="cat"
 dirCache="$HOME/.oxdic_cache"
 TIMEOUT_SECONDS=25
