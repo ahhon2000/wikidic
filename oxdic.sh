@@ -7,7 +7,8 @@
 set -u
 
 #urlBase="http://en.oxforddictionaries.com/definition"
-urlBase="http://www.lexico.com/en/definition"
+#urlBase="http://www.lexico.com/en/definition"
+urlBase="https://www.lexico.com/definition"
 pager="cat"
 dirCache="$HOME/.oxdic_cache"
 TIMEOUT_SECONDS=25
