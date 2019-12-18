@@ -18,7 +18,7 @@ preprocess="$dirScript/oxdicPreprocess"
 fileTmp="/tmp/.oxdicCache.$$.$RANDOM"
 
 rmScum() {
-	sed -n '/definition.*\s\+of.*in/I,/^\s\+Word of the Day/p;'
+	sed -n '/\(meaning\|definition\).*\s\+of.*in/I,/^\s\+Word of the Day/p;'
 }
 
 
