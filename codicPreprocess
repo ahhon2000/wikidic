@@ -1,0 +1,30 @@
+#!/usr/bin/python3
+
+import sys
+import re
+
+ls = []
+ts = []  # transcriptions
+for l in sys.stdin:
+	l = re.sub(r'\n', '', l)
+	ls += [l]
+
+	flgTr = False
+	if re.search(r'^\s*[(][^)(]+[)]\s*$', l):
+		if not re.search(r'[0-9]', l):
+			flgTr = True
+	elif re.search(r'[(][^)(]+[)]', l):
+		s = re.sub(r'.*[(]([^)(]+)[)].*', '\1', l)
+		for c in "'ˌʒʃðθæɛəɑɔ:":
+			if c in s:
+				flgTr = True
+				break
+
+	if flgTr: ts += [l]
+
+for t in ts:
+	print(t)
+if ts: print("     *")
+
+for l in ls:
+	print(l)

@@ -12,8 +12,7 @@ dirCache="$HOME/.codic_cache"
 TIMEOUT_SECONDS=25
 pathScript="`readlink -f "$0"`"
 dirScript="`dirname "$pathScript"`"
-#preprocess="$dirScript/oxdicPreprocess"
-preprocess="cat"
+preprocess="$dirScript/codicPreprocess"
 fileTmp="/tmp/.codicCache.$$.$RANDOM"
 
 rmScum() {
