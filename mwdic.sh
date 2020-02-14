@@ -8,13 +8,13 @@ set -u
 
 urlBase="https://www.merriam-webster.com/dictionary"
 pager="cat"
-dirCache="$HOME/.medic_cache"
+dirCache="$HOME/.mwdic_cache"
 TIMEOUT_SECONDS=25
 pathScript="`readlink -f "$0"`"
 dirScript="`dirname "$pathScript"`"
-#preprocess="$dirScript/medicPreprocess"
+#preprocess="$dirScript/mwdicPreprocess"
 preprocess=cat
-fileTmp="/tmp/.medicCache.$$.$RANDOM"
+fileTmp="/tmp/.mwdicCache.$$.$RANDOM"
 
 rmScum() {
 	sed '1,/^\s*Log\s\+In\s*$/d' | \
