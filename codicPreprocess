@@ -14,8 +14,8 @@ for l in sys.stdin:
 		if not re.search(r'[0-9]', l):
 			flgTr = True
 	elif re.search(r'[(][^)(]+[)]', l):
-		s = re.sub(r'.*[(]([^)(]+)[)].*', '\1', l)
-		for c in "'ˌʒʃðθæɛəɑɔ:":
+		s = re.sub(r'.*[(]([^)(]+)[)].*', r'\1', l)
+		for c in "'ˌʒʃðθæɛəɑɔʊ:":
 			if c in s:
 				flgTr = True
 				break
