@@ -3,18 +3,46 @@
 import sys
 import re
 
-ls = []
-ts = []  # transcriptions
-for l in sys.stdin:
-	l = re.sub(r'\n', '', l)
-	ls += [l]
+def rmScum(ls):
+    ret = []
+    flgScum = True
+    for l in ls:
+        if re.search(
+            r'(meaning|definition).*\s+of.*in', l,
+            flags=re.IGNORECASE,
+        ):
+            flgScum = False
 
-	if re.search(r'[/][^/]+[/]', l):
-		ts += [l]
+        if re.search(
+            '^\s+Word of the Day', l,
+            flags=re.IGNORECASE,
+        ):
+            flgScum = True
 
-for t in ts:
-	print(t)
-if ts: print("     *")
+        if flgScum: continue
+        if re.search('^\s*Translate\s.*into\s[A-Z][^\s]+\s*$', l): continue
+
+        ret += [l]
+
+    return ret
+    
+
+def transcr(ls):
+    ret = []
+    ts = []  # transcriptions
+    for l in ls:
+        trConds = [re.search(r'[/][^/]+[/]', l)]
+        trConds += list(l.find(s) < 0 for s in ('http', 'www.'))
+        if all(trConds): ts += [l]
+
+    ret += ["     *"] if ts else []
+    ret += ts
+    for l in ls: ret += [l]
+
+    return ret
+
+ls = list(map(lambda l: re.sub(r'\n', '', l), sys.stdin.readlines()))
+for f in (rmScum, transcr): ls = f(ls)
 
 for l in ls:
-	print(l)
+    print(l)

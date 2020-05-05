@@ -17,9 +17,9 @@ dirScript="`dirname "$pathScript"`"
 preprocess="$dirScript/oxdicPreprocess"
 fileTmp="/tmp/.oxdicCache.$$.$RANDOM"
 
-rmScum() {
-	sed -n '/\(meaning\|definition\).*\s\+of.*in/I,/^\s\+Word of the Day/p;'
-}
+#rmScum() {
+#	sed -n '/\(meaning\|definition\).*\s\+of.*in/I,/^\s\+Word of the Day/Ip;'
+#}
 
 
 print_usage(){
@@ -34,7 +34,7 @@ EOF
 }
 
 outputter() {
-	cat "$fileCache" | rmScum | "$preprocess" | "$pager"
+	cat "$fileCache" | "$preprocess" | "$pager"
 }
 
 
