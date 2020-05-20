@@ -14,7 +14,7 @@ def rmScum(ls):
             flgScum = False
 
         if re.search(
-            '^\s+Word of the Day', l,
+            '^\s*[^\s]*\s*Word of the Day\s*$', l,
             flags=re.IGNORECASE,
         ):
             flgScum = True
