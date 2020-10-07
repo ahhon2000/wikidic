@@ -7,15 +7,51 @@
 
 set -u
 
-tmp="/tmp/.dic_tmp.$$"
-flgLess=1
+print_usage(){
+    fd=1
+    [ "$1" -ne 0 ] && fd=2
+    cat >&$fd << EOF
+Usage: $0 [options]...
+    -h, --help               Print help
+    -r, --redownload         For compatibility with oxdic
+EOF
+    exit "$1"
+}
 
-a="$1"
-if [ "$a" = '-n' ]; then
-    flgLess=0
+SHORTOPTS='hnr'
+LONGOPTS='help,no-less,redownload'
+args=`getopt -l $LONGOPTS $SHORTOPTS "$@"` || print_usage 1 >&2
+
+eval set -- $args
+
+flgNoLess=0
+flgRedownload=0
+
+while [ "$1" '!=' -- ]; do
+    case "$1" in
+        --help | -h)
+            print_usage 0 >&1
+        ;;
+        --no-less | -n)
+            flgNoLess=1
+        ;;
+        --redownload | -r)
+            flgRedownload=1
+        ;;
+        ?)
+            print_usage 1
+        ;;
+    esac
     shift
+done
+shift
+
+if [ $# -lt 1 ]; then
+    echo give a word >&2
+    exit 1
 fi
 
+tmp="/tmp/.dic_tmp.$$"
 w="$1"
 
 cleanup() {
@@ -35,7 +71,7 @@ if [ $? -ne 0 ]; then
     flgPrintDlInfo=0
 fi
 
-if [ $flgLess -ne 0 ]; then
+if [ $flgNoLess -eq 0 ]; then
     cat "$tmp" | less
 else
     cat "$tmp"
