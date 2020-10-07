@@ -1,8 +1,8 @@
 #!/bin/bash
 #
 # USAGE: wikidic WORD
-#	 or:
-#	 wikidic -c   # clear cache
+#     or:
+#     wikidic -c   # clear cache
 
 set -u
 
@@ -17,24 +17,26 @@ dirScript="`dirname "$pathScript"`"
 preprocess="$dirScript/oxdicPreprocess"
 fileTmp="/tmp/.oxdicCache.$$.$RANDOM"
 
+dlAttempt=0
+
 #rmScum() {
-#	sed -n '/\(meaning\|definition\).*\s\+of.*in/I,/^\s\+Word of the Day/Ip;'
+#    sed -n '/\(meaning\|definition\).*\s\+of.*in/I,/^\s\+Word of the Day/Ip;'
 #}
 
 
 print_usage(){
-	fd=1
-	[ "$1" -ne 0 ] && fd=2
-	cat >&$fd << EOF
+    fd=1
+    [ "$1" -ne 0 ] && fd=2
+    cat >&$fd << EOF
 Usage: $0 [options]...
     -h, --help               Print help
     -r, --redownload         Redownload article if empty
 EOF
-	exit "$1"
+    exit "$1"
 }
 
 outputter() {
-	cat "$fileCache" | "$preprocess" | "$pager"
+    cat "$fileCache" | "$preprocess" | "$pager"
 }
 
 
@@ -48,51 +50,55 @@ flgNoLess=0
 flgRedownload=0
 
 while [ "$1" '!=' -- ]; do
-	case "$1" in
-		--help | -h)
-			print_usage 0 >&1
-		;;
-		--no-less | -n)
-			flgNoLess=1
-		;;
-		--redownload | -r)
-			flgRedownload=1
-		;;
-		?)
-			print_usage 1
-		;;
-	esac
-	shift
+    case "$1" in
+        --help | -h)
+            print_usage 0 >&1
+        ;;
+        --no-less | -n)
+            flgNoLess=1
+        ;;
+        --redownload | -r)
+            flgRedownload=1
+        ;;
+        ?)
+            print_usage 1
+        ;;
+    esac
+    shift
 done
 shift
 
 
 if [ $# -lt 1 ]; then
-	echo give a word >&2
-	exit 1
+    echo give a word >&2
+    exit 1
 fi
 
 mkdir -p "$dirCache"
 
 arr=()
 for a; do
-	arr+=("$a")
+    arr+=("$a")
 done
 
 phrase="`echo ${arr[@]}`"
 url="$urlBase/$phrase"
 
 if [ $flgNoLess -eq 0 ]; then
-	pager=less
+    pager=less
 fi
 
 fileCache="$dirCache/$phrase"
 if [ '!' -e "$fileCache" ] || ( [ $flgRedownload -ne 0 ] && ! outputter | grep '[^[:space:]]'  > /dev/null ); then
-#	rm -f "$fileTmp"
-#	wget --max-redirect 100 --timeout "$TIMEOUT_SECONDS" --quiet "$url" -O "$fileTmp"
-#	wget --max-redirect 100 --timeout "$TIMEOUT_SECONDS" "$url" -O "$fileTmp"
-	timeout $TIMEOUT_SECONDS lynx -dump "$url" > "$fileCache"
-#	rm -f "$fileTmp"
+#    rm -f "$fileTmp"
+#    wget --max-redirect 100 --timeout "$TIMEOUT_SECONDS" --quiet "$url" -O "$fileTmp"
+#    wget --max-redirect 100 --timeout "$TIMEOUT_SECONDS" "$url" -O "$fileTmp"
+    dlAttempt=1
+    timeout $TIMEOUT_SECONDS lynx -dump "$url" > "$fileCache"
+#    rm -f "$fileTmp"
 fi
 
 outputter
+if [ "$dlAttempt" -eq 0 ]; then
+    echo 'no download' >&2
+fi
