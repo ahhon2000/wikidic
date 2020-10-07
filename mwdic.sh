@@ -19,8 +19,10 @@ fileTmp="/tmp/.mwdicCache.$$.$RANDOM"
 dlAttempt=0
 
 rmScum() {
-    sed '1,/^\s*Log\s\+In\s*$/d' | \
-        sed '/^\s*Dictionary Entries near/,$d'
+#    sed '1,/^\s*Log\s\+In\s*$/d' | \
+#        sed '/^\s*Dictionary Entries near/,$d'
+    sed -n '/^[^[:space:]]/,$p' | \
+        sed '/^[[:space:]]*Dictionary Entries near/,$d'
 }
 
 print_usage(){
