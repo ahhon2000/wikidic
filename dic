@@ -12,31 +12,37 @@ flgLess=1
 
 a="$1"
 if [ "$a" = '-n' ]; then
-	flgLess=0
-	shift
+    flgLess=0
+    shift
 fi
 
 w="$1"
 
 cleanup() {
-	rm -f "$tmp"
-	echo
-	exit
+    rm -f "$tmp"
+    echo
+    exit
 }
 
 trap cleanup SIGTERM 
 trap cleanup SIGINT 
 
+flgPrintDlInfo=1
 dict "$w" > "$tmp"
 if [ $? -ne 0 ]; then
-	#wikidic -n "$w" > "$tmp"
-	oxdic -n "$w" > "$tmp"
+    #wikidic -n "$w" > "$tmp"
+    oxdic -n "$w" > "$tmp"
+    flgPrintDlInfo=0
 fi
 
 if [ $flgLess -ne 0 ]; then
-	cat "$tmp" | less
+    cat "$tmp" | less
 else
-	cat "$tmp"
+    cat "$tmp"
+fi
+
+if [ "$flgPrintDlInfo" -ne 0 ]; then
+    echo no download >&2
 fi
 
 cleanup
