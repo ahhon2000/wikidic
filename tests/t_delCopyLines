@@ -10,20 +10,25 @@ from DictionaryApp import delLines, copyLines
 
 ls = ['alpha', 'beta', 'alpha']
 
-assert delLines(ls, r'alpha', r'alpha') == [],    'delLines'
-assert delLines(ls, r'alpha') == ['beta'],    'delLines'
-assert delLines(ls, r'z') == ['alpha', 'beta', 'alpha'],    'delLines'
-assert delLines(ls, 0, None) == [],    'delLines'
-assert delLines(ls, 1, 1) == ['alpha', 'alpha'],    'delLines'
+def delLinesLst(*arg):
+    return list(delLines(*arg))
+def copyLinesLst(*arg):
+    return list(copyLines(*arg))
 
-assert copyLines(ls, r'beta', r'alpha') == ['beta', 'alpha'],   'copyLines'
-assert copyLines(ls, r'alpha', r'alpha') == ['alpha', 'beta', 'alpha'],   'copyLines'
+assert delLinesLst(ls, r'alpha', r'alpha') == [],    'delLinesLst'
+assert delLinesLst(ls, r'alpha') == ['beta'],    'delLinesLst'
+assert delLinesLst(ls, r'z') == ['alpha', 'beta', 'alpha'],    'delLinesLst'
+assert delLinesLst(ls, 0, None) == [],    'delLinesLst'
+assert delLinesLst(ls, 1, 1) == ['alpha', 'alpha'],    'delLinesLst'
+
+assert copyLinesLst(ls, r'beta', r'alpha') == ['beta', 'alpha'],   'copyLinesLst'
+assert copyLinesLst(ls, r'alpha', r'alpha') == ['alpha', 'beta', 'alpha'],   'copyLinesLst'
 
 ls = ['alpha', 'beta', 'gamma', 'alpha', 'beta', 'gamma']
-assert delLines(ls, 'alpha', 'beta') == ['gamma', 'gamma'],    'delLines'
-assert delLines(ls, 'alpha', None) == [],    'delLines'
+assert delLinesLst(ls, 'alpha', 'beta') == ['gamma', 'gamma'],    'delLinesLst'
+assert delLinesLst(ls, 'alpha', None) == [],    'delLinesLst'
 
-assert copyLines(ls, 'alpha', 'beta') == ['alpha', 'beta', 'alpha', 'beta'],    'copyLines'
-assert copyLines(ls, 'beta', None) == ['beta', 'gamma', 'alpha', 'beta', 'gamma'],    'copyLines'
-assert copyLines(ls, 0, None) == ['alpha', 'beta', 'gamma', 'alpha', 'beta', 'gamma'],    'copyLines'
-assert copyLines(ls, 2, 2) == ['gamma'],    'copyLines'
+assert copyLinesLst(ls, 'alpha', 'beta') == ['alpha', 'beta', 'alpha', 'beta'],    'copyLinesLst'
+assert copyLinesLst(ls, 'beta', None) == ['beta', 'gamma', 'alpha', 'beta', 'gamma'],    'copyLinesLst'
+assert copyLinesLst(ls, 0, None) == ['alpha', 'beta', 'gamma', 'alpha', 'beta', 'gamma'],    'copyLinesLst'
+assert copyLinesLst(ls, 2, 2) == ['gamma'],    'copyLinesLst'
