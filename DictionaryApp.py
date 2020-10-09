@@ -7,24 +7,33 @@ from EasyPipe import Pipe
 
 DFLT_TIMEOUT_SECONDS = 25
 
-class _Address:
+class _AddressBase:
     def __init__(self, addr):
         self.regex = None
         self.lineNum = None
-        self.isLineNum = isinstance(addr, int)
+        self.isLineNum = False
 
-        if self.isLineNum:
-            self.lineNum = addr
-        else:
-            self.regex = re.compile(r'' + addr)
+class _AddressInt(_AddressBase):
+    def __init__(self, addr):
+        _AddressBase.__init__(self, addr)
+        self.lineNum = addr
+        self.isLineNum = True
 
     def chkMatch(self, i, l):
-        if self.isLineNum:
-            if i == self.lineNum: return True
-        else:
-            if self.regex.search(l): return True
+        return i == self.lineNum
 
-        return False
+class _AddressRe(_AddressBase):
+    def __init__(self, addr):
+        _AddressBase.__init__(self, addr)
+        self.regex = re.compile(r'' + addr)
+        self.isLineNum = False
+
+    def chkMatch(self, i, l):
+        return self.regex.search(l)
+
+def _Address(addr):
+    if isinstance(addr, int): return _AddressInt(addr)
+    return _AddressRe(addr)
 
 
 def _delCopyLines(ls, *addrs, mode=None):
@@ -46,10 +55,9 @@ def _delCopyLines(ls, *addrs, mode=None):
                 flgInside = True
                 flgAddr1Matched = True
 
-        if any((
-            mode == 'copy' and flgInside,
-            mode == 'delete' and not flgInside
-        )):
+        if not flgInside and mode == 'delete' or \
+            flgInside and mode == 'copy':
+
             ols += [l]
 
         if len(addrs) == 1:
@@ -130,12 +138,15 @@ class DictionaryApp:
         return self.cacheDir / self.phrase
 
     def outputIsEmpty(self):
-        return all(re.search(r'^\s*$', l) for l in self.outputLines)
+        strEmpt = re.compile(r'^\s*$')
+        for l in self.outputLines:
+            if not strEmpt.search(l): return False
+        return True
 
     def loadCached(self):
         f = self.getCacheFile()
         with f.open() as fp:
-            self.lines = list(re.sub(r'\n$', r'', l) for l in fp)
+            self.lines = list(l.rstrip("\n") for l in fp)
 
     def output(self):
         if not self.pager or self.options.no_less:
@@ -173,10 +184,9 @@ class DictionaryApp:
             self.loadCached()
             self.processLines()
 
-        if any((
-            not flgCached,
-            self.outputIsEmpty() and self.options.redownload,
-        )):
+        if not flgCached  or  \
+            self.outputIsEmpty() and self.options.redownload:
+
             self.download()
             self.processLines()
 
