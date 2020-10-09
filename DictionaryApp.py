@@ -1,9 +1,6 @@
 import os, sys
 import argparse
-import pydoc
 import re
-
-from EasyPipe import Pipe
 
 DFLT_TIMEOUT_SECONDS = 25
 
@@ -160,6 +157,7 @@ class DictionaryApp:
                 print(l)
         else:
             # with a pager
+            import pydoc
             t = "".join(l + "\n" for l in self.outputLines)
             oldpager = os.environ.get('PAGER', '')
             pydoc.pager(t)
@@ -178,6 +176,7 @@ class DictionaryApp:
         ).split()
         cmd += [self.phrase]
 
+        from EasyPipe import Pipe
         pipe = Pipe(cmd)
         with self.getCacheFile().open('w') as fp:
             fp.write(pipe.stdout)
