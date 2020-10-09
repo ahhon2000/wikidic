@@ -2,7 +2,7 @@ import os
 import re
 from pathlib import Path
 
-from DictionaryApp import DictionaryApp
+from DictionaryApp import DictionaryApp, delLines, copyLines
 
 class DictionaryAppCO(DictionaryApp):
     def __init__(self, *arg, **kwarg):
@@ -14,9 +14,15 @@ class DictionaryAppCO(DictionaryApp):
     def processLines(self):
         ols = self.lines
 
-        def delFromRegex(ls, r):
-            
-            
-        
-        for flt in (rmScum,): ols = flt(ols)
-        self.outputLines = list(ols)
+        for flt in (
+            lambda ls: delLines(ls, 0, r'^Definition\s+of\s+' + "'"),
+            lambda ls: delLines(ls, r'^[()*\s]+$'),
+            lambda ls: delLines(ls, r'^\s*Word Frequency\s*$'),
+            lambda ls: delLines(ls, r'^Translations for\b', None),
+            lambda ls: delLines(ls, r'^Trends of\b', None),
+            lambda ls: delLines(ls, r'^\s*References\s*$', None),
+            lambda ls: delLines(ls, r'^\s*Share\s*$', None),
+        ):
+            ols = flt(ols)
+
+        self.outputLines = ols

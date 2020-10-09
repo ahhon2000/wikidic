@@ -7,7 +7,11 @@ from EasyPipe import Pipe
 
 DFLT_TIMEOUT_SECONDS = 25
 
-def _delCopyLines(ls, addr1, addr2, mode=None):
+def _delCopyLines(ls, *addrs, mode=None):
+    if len(addrs) not in (1, 2): raise Exception('wrong # of args')
+    addr1 = addrs[0]
+    addr2 = addrs[0] if len(addrs) == 1 else addrs[1]
+
     if mode not in ('copy', 'delete'): raise Exception('unsupported mode')
 
     if addr2 is None: addr2 = len(ls) - 1
@@ -31,11 +35,32 @@ def _delCopyLines(ls, addr1, addr2, mode=None):
 
     return ols
 
-def delLines(ls, addr1, addr2):
-    return _delCopyLines(ls, addr1, addr2, mode='delete')
+def delLines(ls, *addrs):
+    """Return a copy of ls with certain lines removed
 
-def copyLines(ls, addr1, addr2):
-    return _delCopyLines(ls, addr1, addr2, mode='copy')
+    USAGE: delLines(ls, ADDR1, ADDR2)
+    USAGE: delLines(ls, ADDR1)
+    
+    Addresses can be either line numbers (starting with 0) or regexps.
+    If ADDR2 is None then delete until the last line, incl.
+    With only one address (ADDR1), remove lines matching ADDR1. Otherwise,
+    remove lines from ADDR1 to ADDR2, incl.
+    """
+
+    return _delCopyLines(ls, *addrs, mode='delete')
+
+def copyLines(ls, *addrs):
+    """Return a copy of ls that contains only lines matching the addresses
+
+    USAGE: copyLines(ls, ADDR1, ADDR2)
+    USAGE: copyLines(ls, ADDR1)
+    
+    Addresses can be either line numbers (starting with 0) or regexps.
+    If ADDR2 is None then copy until the last line, incl.
+    With only one address (ADDR1), copy lines matching ADDR1. Otherwise,
+    copy lines from ADDR1 to ADDR2, incl.
+    """
+    return _delCopyLines(ls, *addrs, mode='copy')
 
 
 class DictionaryApp:

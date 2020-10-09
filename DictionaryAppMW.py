@@ -19,4 +19,5 @@ class DictionaryAppMW(DictionaryApp):
             lambda ls: delLines(ls, r'^\s*Dictionary Entries near', None),
         ):
             ols = flt(ols)
-        self.outputLines = list(ols)
+
+        self.outputLines = ols
