@@ -7,30 +7,42 @@ from EasyPipe import Pipe
 
 DFLT_TIMEOUT_SECONDS = 25
 
-def _addrMatches(i, l, addr):
-    if any((
-        isinstance(addr, int) and i == addr,
-        not isinstance(addr, int) and re.search(r'' + addr, l),
-    )):
-        return True
+class _Address:
+    def __init__(self, addr):
+        self.regex = None
+        self.lineNum = None
+        self.isLineNum = isinstance(addr, int)
 
-    return False
+        if self.isLineNum:
+            self.lineNum = addr
+        else:
+            self.regex = re.compile(r'' + addr)
+
+    def chkMatch(self, i, l):
+        if self.isLineNum:
+            if i == self.lineNum: return True
+        else:
+            if self.regex.search(l): return True
+
+        return False
+
 
 def _delCopyLines(ls, *addrs, mode=None):
     if len(addrs) not in (1, 2): raise Exception('wrong # of args')
-    addr1 = addrs[0]
-    addr2 = addrs[0] if len(addrs) == 1 else addrs[1]
-
     if mode not in ('copy', 'delete'): raise Exception('unsupported mode')
 
+    addr1 = addrs[0]
+    addr2 = addrs[0] if len(addrs) == 1 else addrs[1]
     if addr2 is None: addr2 = len(ls) - 1
+
+    (addr1, addr2) = map(_Address, (addr1, addr2))
 
     ols = []
     flgInside = False
     for i, l in enumerate(ls):
         flgAddr1Matched = False
         if not flgInside:
-            if _addrMatches(i, l, addr1):
+            if addr1.chkMatch(i, l):
                 flgInside = True
                 flgAddr1Matched = True
 
@@ -42,8 +54,8 @@ def _delCopyLines(ls, *addrs, mode=None):
 
         if len(addrs) == 1:
             flgInside = False
-        elif flgInside and not flgAddr1Matched  or  isinstance(addr2, int):
-            if _addrMatches(i, l, addr2):
+        elif flgInside and not flgAddr1Matched  or  addr2.isLineNum:
+            if addr2.chkMatch(i, l):
                 flgInside = False
 
     return ols
