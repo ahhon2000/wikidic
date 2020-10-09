@@ -2,7 +2,7 @@ import os
 import re
 from pathlib import Path
 
-from DictionaryApp import DictionaryApp
+from DictionaryApp import DictionaryApp, delLines, copyLines
 
 class DictionaryAppMW(DictionaryApp):
     def __init__(self, *arg, **kwarg):
@@ -13,16 +13,10 @@ class DictionaryAppMW(DictionaryApp):
 
     def processLines(self):
         ols = self.lines
-
-        def flt1(ls):
-            for i, l in enumerate(ls):
-                if re.search(r'^[^\s]', l): return ls[i:]
-            return []
-
-        def flt2(ls):
-            for i, l in enumerate(ls):
-                if re.search(r'^\s*Dictionary Entries near', l): return ls[0:i]
-            return ls
         
-        for flt in (flt1, flt2): ols = flt(ols)
+        for flt in (
+            lambda ls: copyLines(ls, r'^[^\s]', None),
+            lambda ls: delLines(ls, r'^\s*Dictionary Entries near', None),
+        ):
+            ols = flt(ols)
         self.outputLines = list(ols)

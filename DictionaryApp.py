@@ -7,6 +7,37 @@ from EasyPipe import Pipe
 
 DFLT_TIMEOUT_SECONDS = 25
 
+def _delCopyLines(ls, addr1, addr2, mode=None):
+    if mode not in ('copy', 'delete'): raise Exception('unsupported mode')
+
+    if addr2 is None: addr2 = len(ls) - 1
+
+    ols = []
+    flgDel = False if mode == 'delete' else True
+    for i, l in enumerate(ls):
+        if any((
+            isinstance(addr1, int) and i == addr1,
+            not isinstance(addr1, int) and re.search(r'' + addr1, l),
+        )):
+            flgDel = True if mode == 'delete' else False
+
+        if not flgDel: ols += [l]
+
+        if any((
+            isinstance(addr2, int) and i == addr2,
+            not isinstance(addr2, int) and re.search(r'' + addr2, l),
+        )):
+            flgDel = False if mode == 'delete' else True
+
+    return ols
+
+def delLines(ls, addr1, addr2):
+    return _delCopyLines(ls, addr1, addr2, mode='delete')
+
+def copyLines(ls, addr1, addr2):
+    return _delCopyLines(ls, addr1, addr2, mode='copy')
+
+
 class DictionaryApp:
     def __init__(self, clArgs=[], pager='less'):
         self.clArgs = list(clArgs)
