@@ -7,6 +7,15 @@ from EasyPipe import Pipe
 
 DFLT_TIMEOUT_SECONDS = 25
 
+def _addrMatches(i, l, addr):
+    if any((
+        isinstance(addr, int) and i == addr,
+        not isinstance(addr, int) and re.search(r'' + addr, l),
+    )):
+        return True
+
+    return False
+
 def _delCopyLines(ls, *addrs, mode=None):
     if len(addrs) not in (1, 2): raise Exception('wrong # of args')
     addr1 = addrs[0]
@@ -17,21 +26,25 @@ def _delCopyLines(ls, *addrs, mode=None):
     if addr2 is None: addr2 = len(ls) - 1
 
     ols = []
-    flgDel = False if mode == 'delete' else True
+    flgInside = False
     for i, l in enumerate(ls):
-        if any((
-            isinstance(addr1, int) and i == addr1,
-            not isinstance(addr1, int) and re.search(r'' + addr1, l),
-        )):
-            flgDel = True if mode == 'delete' else False
-
-        if not flgDel: ols += [l]
+        flgAddr1Matched = False
+        if not flgInside:
+            if _addrMatches(i, l, addr1):
+                flgInside = True
+                flgAddr1Matched = True
 
         if any((
-            isinstance(addr2, int) and i == addr2,
-            not isinstance(addr2, int) and re.search(r'' + addr2, l),
+            mode == 'copy' and flgInside,
+            mode == 'delete' and not flgInside
         )):
-            flgDel = False if mode == 'delete' else True
+            ols += [l]
+
+        if len(addrs) == 1:
+            flgInside = False
+        elif flgInside and not flgAddr1Matched  or  isinstance(addr2, int):
+            if _addrMatches(i, l, addr2):
+                flgInside = False
 
     return ols
 
@@ -110,7 +123,7 @@ class DictionaryApp:
     def loadCached(self):
         f = self.getCacheFile()
         with f.open() as fp:
-            self.lines = list(map(lambda l: re.sub(r"\n+$", r'', l), fp))
+            self.lines = list(re.sub(r'\n$', r'', l) for l in fp)
 
     def output(self):
         if not self.pager or self.options.no_less:

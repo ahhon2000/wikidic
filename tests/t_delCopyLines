@@ -1,0 +1,29 @@
+#!/usr/bin/python3
+
+import sys, os
+from pathlib import Path
+appPath = Path(__file__).parent.absolute()
+sys.path = [str(appPath), str(appPath / '..')] + sys.path
+
+from DictionaryApp import delLines, copyLines
+
+
+ls = ['alpha', 'beta', 'alpha']
+
+assert delLines(ls, r'alpha', r'alpha') == [],    'delLines'
+assert delLines(ls, r'alpha') == ['beta'],    'delLines'
+assert delLines(ls, r'z') == ['alpha', 'beta', 'alpha'],    'delLines'
+assert delLines(ls, 0, None) == [],    'delLines'
+assert delLines(ls, 1, 1) == ['alpha', 'alpha'],    'delLines'
+
+assert copyLines(ls, r'beta', r'alpha') == ['beta', 'alpha'],   'copyLines'
+assert copyLines(ls, r'alpha', r'alpha') == ['alpha', 'beta', 'alpha'],   'copyLines'
+
+ls = ['alpha', 'beta', 'gamma', 'alpha', 'beta', 'gamma']
+assert delLines(ls, 'alpha', 'beta') == ['gamma', 'gamma'],    'delLines'
+assert delLines(ls, 'alpha', None) == [],    'delLines'
+
+assert copyLines(ls, 'alpha', 'beta') == ['alpha', 'beta', 'alpha', 'beta'],    'copyLines'
+assert copyLines(ls, 'beta', None) == ['beta', 'gamma', 'alpha', 'beta', 'gamma'],    'copyLines'
+assert copyLines(ls, 0, None) == ['alpha', 'beta', 'gamma', 'alpha', 'beta', 'gamma'],    'copyLines'
+assert copyLines(ls, 2, 2) == ['gamma'],    'copyLines'
