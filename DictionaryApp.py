@@ -1,9 +1,11 @@
-import os
+import os, sys
 import argparse
 import pydoc
 import re
 
 from EasyPipe import Pipe
+
+DFLT_TIMEOUT_SECONDS = 25
 
 class DictionaryApp:
     def __init__(self, clArgs=[], pager='less'):
@@ -14,8 +16,11 @@ class DictionaryApp:
         self.phrase = ''
         self.urlBase = ''
         self.cacheDir = None   # should be a Path object
+        self.dlAttempt = False
         self.lines = []
         self.outputLines = []
+
+        self.timeout_seconds = DFLT_TIMEOUT_SECONDS
 
         self._parseCLArgs()
 
@@ -26,25 +31,28 @@ class DictionaryApp:
         argp.add_argument('-r', '--redownload', action="store_true", help="Redownload article if cache is empty")
         argp.add_argument("arguments", nargs='*')
 
-        print("debug", self.clArgs)
         opt = argp.parse_args(self.clArgs[1:])
 
         self.options = opt
 
         p = " ".join(opt.arguments)
         p = re.sub(r'\s{2,}', r' ', p.strip())
+        if not p: raise Exception('no phrase given')
+
         self.phrase = p
 
     def phraseIsCached(self):
-        f = self.cacheDir / self.phrase
+        f = self.getCacheFile()
         return f.exists()
+
+    def getCacheFile(self):
+        return self.cacheDir / self.phrase
 
     def outputIsEmpty(self):
         return all(re.search(r'^\s*$', l) for l in self.outputLines)
 
     def loadCached(self):
-        f = self.cacheDir / self.phrase
-        print('debug f =', f)
+        f = self.getCacheFile()
         with f.open() as fp:
             self.lines = list(map(lambda l: re.sub(r"\n+$", r'', l), fp))
 
@@ -60,11 +68,23 @@ class DictionaryApp:
             pydoc.pager(t)
             os.environ['PAGER'] = oldpager
 
+        if not self.dlAttempt: sys.stderr.write("no download\n")
+
     def processLines(self):
         self.outputLines = list(self.lines)
 
     def download(self):
-        pass
+        self.dlAttempt = True
+
+        cmd = "timeout {tosec} lynx -dump".format(
+            tosec = self.timeout_seconds,
+        ).split()
+        cmd += [self.phrase]
+
+        pipe = Pipe(cmd)
+        with self.getCacheFile().open('w') as fp:
+            fp.write(pipe.stdout)
+        self.lines = pipe.stdout.split("\n")
         
     def run(self):
         flgCached = self.phraseIsCached()
