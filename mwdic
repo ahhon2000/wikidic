@@ -1,0 +1,11 @@
+#!/usr/bin/python3
+
+import sys, os
+from pathlib import Path
+appPath = Path(__file__).parent.absolute()
+sys.path = [str(appPath)] + sys.path
+
+from DictionaryAppMW import DictionaryAppMW
+
+dapp = DictionaryAppMW(clArgs=sys.argv)
+dapp.run()
