@@ -17,6 +17,7 @@ class DictionaryAppMW(DictionaryApp):
         for flt in (
             lambda ls: copyLines(ls, r'^[^\s]', None),
             lambda ls: delLines(ls, r'^\s*Dictionary Entries near', None),
+            lambda ls: delLines(ls, r'Save\s+Word', 'Log\s+In'),
         ):
             ols = flt(ols)
 
