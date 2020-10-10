@@ -13,12 +13,24 @@ class DictionaryAppMW(DictionaryApp):
 
     def processLines(self):
         ols = self.lines
+
+        emptyMarkers = re.compile(r"^\s*The word you've entered isn't in the dictionary")
+        flgEmpty = False
+        def detectEmptyArticle(ls):
+            nonlocal emptyMarkers, flgEmpty
+            for l in ls:
+                if emptyMarkers.search(l):
+                    flgEmpty = True
+                    break
+                yield l
         
         for flt in (
+            lambda ls: detectEmptyArticle(ls),
             lambda ls: copyLines(ls, r'^[^\s]', None),
             lambda ls: delLines(ls, r'^\s*Dictionary Entries near', None),
             lambda ls: delLines(ls, r'Save\s+Word', 'Log\s+In'),
         ):
             ols = flt(ols)
 
-        self.outputLines = list(ols)
+        ols = list(ols)
+        self.outputLines = [] if flgEmpty else ols

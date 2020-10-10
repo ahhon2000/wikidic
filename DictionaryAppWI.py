@@ -14,7 +14,18 @@ class DictionaryAppWI(DictionaryApp):
     def processLines(self):
         ols = self.lines
 
+        emptyMarkers = re.compile(r'^\s*Wiktionary does not yet have an entry for')
+        flgEmpty = False
+        def detectEmptyArticle(ls):
+            nonlocal emptyMarkers, flgEmpty
+            for l in ls:
+                if emptyMarkers.search(l):
+                    flgEmpty = True
+                    break
+                yield l
+
         for flt in (
+            lambda ls: detectEmptyArticle(ls),
             lambda ls: delLines(ls, r'^Contents\b', r'^[^\s]'),
             lambda ls: delLines(ls, r'^Translation', r'^[^\s]'),
             lambda ls: delLines(ls, r'^Navigation menu', None),
@@ -25,4 +36,5 @@ class DictionaryAppWI(DictionaryApp):
         ):
             ols = flt(ols)
 
-        self.outputLines = list(ols)
+        ols = list(ols)
+        self.outputLines = [] if flgEmpty else ols

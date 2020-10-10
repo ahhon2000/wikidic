@@ -174,7 +174,7 @@ class DictionaryApp:
         cmd = "timeout {tosec} lynx -dump".format(
             tosec = self.timeout_seconds,
         ).split()
-        cmd += [self.phrase]
+        cmd += [self.urlBase + '/' + self.phrase]
 
         from EasyPipe import Pipe
         pipe = Pipe(cmd)
