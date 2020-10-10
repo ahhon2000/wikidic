@@ -182,7 +182,7 @@ class DictionaryApp:
             fp.write(pipe.stdout)
         self.lines = pipe.stdout.split("\n")
         
-    def run(self):
+    def run(self, output=True):
         flgCached = self.phraseIsCached()
         if flgCached:
             self.loadCached()
@@ -194,4 +194,8 @@ class DictionaryApp:
             self.download()
             self.processLines()
 
-        self.output()
+        if output: self.output()
+
+        out = "\n".join(self.outputLines)
+        emsg = "" if self.dlAttempt else "no download\n"
+        return (out, emsg, 0)

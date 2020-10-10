@@ -50,4 +50,4 @@ class DictionaryAppCO(DictionaryApp):
         ):
             ols = flt(ols)
 
-        self.outputLines = ols
+        self.outputLines = list(ols)
