@@ -14,18 +14,25 @@ class DictionaryAppWI(DictionaryApp):
     def processLines(self):
         ols = self.lines
 
-        emptyMarkers = re.compile(r'^\s*Wiktionary does not yet have an entry for')
         flgEmpty = False
         def detectEmptyArticle(ls):
-            nonlocal emptyMarkers, flgEmpty
+            nonlocal flgEmpty
+            emptyMarkers = re.compile(r'^\s*Wiktionary does not yet have an entry for')
             for l in ls:
                 if emptyMarkers.search(l):
                     flgEmpty = True
                     break
                 yield l
 
+        def rmReferences(ls):
+            refStart = re.compile(r'^\s*(References\[[^\s]*\]|Retrieved from)\s*$')
+
+            for l in ls:
+                if refStart.search(l): break
+                yield l
+
         for flt in (
-            lambda ls: detectEmptyArticle(ls),
+            detectEmptyArticle,
             lambda ls: delLines(ls, r'^Contents\b', r'^[^\s]'),
             lambda ls: delLines(ls, r'^Translation', r'^[^\s]'),
             lambda ls: delLines(ls, r'^Navigation menu', None),
@@ -33,6 +40,11 @@ class DictionaryAppWI(DictionaryApp):
             lambda ls: delLines(ls, r'^Statistics', r'^[^\s]'),
             lambda ls: delLines(ls, r'^Related terms', r'^[^\s]'),
             lambda ls: delLines(ls, r'^Derived terms', r'^[^\s]'),
+            lambda ls: delLines(ls, r'(Jump to navigation|Jump to search)'),
+            lambda ls: delLines(ls, r'Definition from Wiktionary, the free dictionary'),
+            lambda ls: delLines(ls, r'#.*(Edit.*Wiktionary|Wiktionary Atom feed)'),
+            lambda ls: delLines(ls, r'^\s*Translations\[[^\s]*\]\s*$', None),
+            rmReferences,
         ):
             ols = flt(ols)
 
