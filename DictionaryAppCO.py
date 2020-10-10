@@ -5,6 +5,7 @@ from pathlib import Path
 from DictionaryApp import DictionaryApp, delLines, copyLines
 
 def _codicPostprocess(ls):
+    ls = list(ls)
     ols = []
     ts = []  # transcriptions
     for l in ls:
@@ -45,7 +46,7 @@ class DictionaryAppCO(DictionaryApp):
             lambda ls: delLines(ls, r'^Translations for\b', None),
             lambda ls: delLines(ls, r'^Trends of\b', None),
             lambda ls: delLines(ls, r'^\s*References\s*$', None),
-            lambda ls: delLines(ls, r'^\s*Share\s*$', None),
+            lambda ls: delLines(ls, r'^\s*Share\s*$'),
             _codicPostprocess,
         ):
             ols = flt(ols)
