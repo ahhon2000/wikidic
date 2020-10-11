@@ -32,6 +32,7 @@ class DictionaryAppMW(DictionaryApp):
             lambda ls: delLines(ls, r'^\s*Log In\s*$'),
             lambda ls: delLines(ls, r'^\s*To save this word, you.ll need to log in'),
             lambda ls: delLines(ls, r'^\s*SAVED WORDS.*\bview recents\b\s*$'),
+            lambda ls: delLines(ls, r'^\s*References\s*$', None),
         ):
             ols = flt(ols)
 
