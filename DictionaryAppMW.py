@@ -28,7 +28,10 @@ class DictionaryAppMW(DictionaryApp):
             lambda ls: detectEmptyArticle(ls),
             lambda ls: copyLines(ls, r'^[^\s]', None),
             lambda ls: delLines(ls, r'^\s*Dictionary Entries near', None),
-            lambda ls: delLines(ls, r'Save\s+Word', 'Log\s+In'),
+            lambda ls: delLines(ls, r'^\s*\[[0-9]*\]Save\s+Word\s*$'),
+            lambda ls: delLines(ls, r'^\s*Log In\s*$'),
+            lambda ls: delLines(ls, r'^\s*To save this word, you.ll need to log in'),
+            lambda ls: delLines(ls, r'^\s*SAVED WORDS.*\bview recents\b\s*$'),
         ):
             ols = flt(ols)
 
