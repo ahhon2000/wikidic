@@ -110,6 +110,7 @@ class DictionaryApp:
         self.dlAttempt = False
         self.lines = []
         self.outputLines = []
+        self.result = None
 
         self.timeout_seconds = DFLT_TIMEOUT_SECONDS
 
@@ -118,6 +119,7 @@ class DictionaryApp:
     def _parseCLArgs(self):
         argp = argparse.ArgumentParser()
 
+        argp.add_argument('-j', '--json', action="store_true", help="JSON output")
         argp.add_argument('-n', '--no-less', action="store_true", help="Do not use pager (less)")
         argp.add_argument('-r', '--redownload', action="store_true", help="Redownload article if cache is empty")
         argp.add_argument("arguments", nargs='*')
@@ -151,19 +153,22 @@ class DictionaryApp:
             self.lines = list(l.rstrip("\n") for l in fp)
 
     def output(self):
+        out = None
+        if self.options.json:
+            import json
+            out = json.dumps(self.result) + "\n"
+        else:
+            out = self.result['text'] + "\n"
+
         if not self.pager or self.options.no_less:
             # without a pager
-            for l in self.outputLines:
-                print(l)
+            sys.stdout.write(out)
         else:
             # with a pager
             import pydoc
-            t = "".join(l + "\n" for l in self.outputLines)
             oldpager = os.environ.get('PAGER', '')
-            pydoc.pager(t)
+            pydoc.pager(out)
             os.environ['PAGER'] = oldpager
-
-        if not self.dlAttempt: sys.stderr.write("no download\n")
 
     def processLines(self):
         self.outputLines = list(self.lines)
@@ -194,8 +199,13 @@ class DictionaryApp:
             self.download()
             self.processLines()
 
+        self.result = {
+            'text': "\n".join(self.outputLines),
+            'emsg': '',
+            'status': 0,
+            'dlAttempt': self.dlAttempt,
+        }
+
         if output: self.output()
 
-        out = "\n".join(self.outputLines)
-        emsg = "" if self.dlAttempt else "no download\n"
-        return (out, emsg, 0)
+        return self.result
