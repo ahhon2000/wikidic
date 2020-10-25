@@ -23,6 +23,75 @@ class DictionaryAppMW(DictionaryApp):
                     flgEmpty = True
                     break
                 yield l
+
+        def fmtExampleLine(l):
+            indentRe = re.compile(r'^(?P<indent>\s*)(?P<content>.*)')
+            indentDic = {
+                    'indent': indentRe.sub(r'\g<indent>', l),
+                    'indent2': indentRe.sub(r'\g<indent>', l) * 2,
+            }
+            poss = ('noun', 'adjective', 'verb', 'adverb', 'preposition',
+                'pronoun', 'conjunction', 'exclamation', 'interjection',
+            )
+            posRe = re.compile(r'\s*\b(?P<pos>{poss})\b\s*'.format(
+                    poss = "|".join(pos.capitalize() for pos in poss)
+                ),
+                flags=re.MULTILINE,
+            )
+            subSecRe = re.compile(
+                r'\s*(?P<section>{sections})\s*'.format(
+                    sections = "|".join((
+                        'Examples on the Web:',
+                        'Recent Examples on the Web:',
+                    )),
+                ),
+                flags=re.MULTILINE,
+            )
+            exDelimRe = re.compile(
+                r'\s+—\s+\[\d+\]',
+                flags=re.MULTILINE,
+            )
+
+            l = posRe.sub(r'\n\g<pos>\n',l)
+            l = subSecRe.sub(
+                r'\n\g<section>\n', l,
+            )
+            l = exDelimRe.sub(r'\n', l)
+
+            ls = l.split("\n")
+            for flt in (
+                lambda ll: re.sub(r'^\s*', r'{indent2}'.format(**indentDic),ll),
+                lambda ll: subSecRe.sub(
+                    r'{indent}\g<section>'.format(**indentDic),
+                    ll,
+                ),
+                lambda ll: posRe.sub(
+                    r'{indent}\g<pos>'.format(**indentDic),
+                    ll,
+                ),
+            ):
+                for i, ll in enumerate(ls):
+                    ls[i] = flt(ll)
+
+            l = "\n".join(ls)
+
+            return l
+
+        def fmtExamples(ls):
+            flgExSection = False
+            exSectionStart = re.compile(
+                r'^Examples of\b.*\bin a Sentence',
+                flags=re.IGNORECASE,
+            )
+            exSectionEnd = re.compile(r'^[^\s]')
+            for l in ls:
+                if flgExSection:
+                    if exSectionEnd.search(l):
+                        flgExSection = False
+                    else:
+                        l = fmtExampleLine(l)
+                if exSectionStart.search(l): flgExSection = True
+                yield l
         
         for flt in (
             lambda ls: detectEmptyArticle(ls),
@@ -33,6 +102,7 @@ class DictionaryAppMW(DictionaryApp):
             lambda ls: delLines(ls, r'^\s*To save this word, you.ll need to log in'),
             lambda ls: delLines(ls, r'^\s*SAVED WORDS.*\bview recents\b\s*$'),
             lambda ls: delLines(ls, r'^\s*References\s*$', None),
+            fmtExamples,
         ):
             ols = flt(ols)
 
