@@ -1,6 +1,7 @@
 import os
 import re
 from pathlib import Path
+import calendar
 
 from DictionaryApp import DictionaryApp, delLines, copyLines
 
@@ -51,12 +52,22 @@ class DictionaryAppMW(DictionaryApp):
                 r'\s+—\s+\[\d+\]',
                 flags=re.MULTILINE,
             )
+            quoteDateRe = re.compile(
+                r'\s*\b(?P<date>\d{{1,2}}\s+({months})[.]?\s+\d{{4}})\b\s*'.format(
+                    months = "|".join(
+                        calendar.month_abbr[m+1] for m in range(12)
+                    ),
+                ),
+                flags = re.MULTILINE,
+            )
 
             l = posRe.sub(r'\n\g<pos>\n',l)
             l = subSecRe.sub(
                 r'\n\g<section>\n', l,
             )
-            l = exDelimRe.sub(r'\n', l)
+
+            l = exDelimRe.sub(r'\n-- from:\n', l)
+            l = quoteDateRe.sub(r'\n\g<date>\n--------\n', l)
 
             ls = l.split("\n")
             for flt in (
