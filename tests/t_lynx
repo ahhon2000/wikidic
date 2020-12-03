@@ -1,0 +1,12 @@
+#!/usr/bin/python3
+
+import sys, os
+from pathlib import Path
+appPath = Path(__file__).parent.absolute()
+sys.path = [str(appPath), str(appPath / '..')] + sys.path
+
+from EasyPipe import Pipe
+for cmd in ('timeout 1 echo', 'lynx --version',):
+    cmd = "lynx --version".split()
+    pipe = Pipe(cmd)
+    assert pipe.status == 0, f"the following command failed:\n\t{cmd}\n\texit status: {pipe.status}\n\tstderr: {pipe.stderr}"
