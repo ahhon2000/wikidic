@@ -183,7 +183,9 @@ class DictionaryApp:
 
         from EasyPipe import Pipe
         pipe = Pipe(cmd)
-        if pipe.status: raise Exception(f"the download command failed\n\tcommand: {cmd}\n\texit status: {pipe.status}\n\tstderr: {pipe.stderr}")
+        if pipe.status not in (0, 1):
+            raise Exception(f"the download command failed\n\tcommand: {cmd}\n\texit status: {pipe.status}\n\tclass: {type(self)}\n\tstderr: {pipe.stderr}")
+
         with self.getCacheFile().open('w') as fp:
             fp.write(pipe.stdout)
         self.lines = pipe.stdout.split("\n")
