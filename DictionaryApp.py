@@ -149,7 +149,7 @@ class DictionaryApp:
 
     def loadCached(self):
         f = self.getCacheFile()
-        with f.open() as fp:
+        with f.open(errors='ignore') as fp:
             self.lines = list(l.rstrip("\n") for l in fp)
 
     def output(self):

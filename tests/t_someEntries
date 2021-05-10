@@ -1,0 +1,12 @@
+#!/usr/bin/python3
+
+import sys, os
+from pathlib import Path
+appPath = Path(__file__).parent.absolute()
+sys.path = [str(appPath), str(appPath / '..')] + sys.path
+
+from DictionaryAppWI import DictionaryAppWI
+
+dapp = DictionaryAppWI(['', 'sampleWIEntry'], pager=None)
+dapp.cacheDir = appPath
+dapp.loadCached()
